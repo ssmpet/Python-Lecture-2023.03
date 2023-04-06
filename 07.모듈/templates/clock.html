@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단순 디지털 시계</title>
+    <script>
+        function twoDigit(num) {
+            return (num<10)?'0'+ num : String(num);
+        }
+
+        function myDatetime(date) {
+            return `${date.getFullYear()}-${twoDigit(date.getMonth()+1)}-${twoDigit(date.getDate())} ` +
+                    `${twoDigit(date.getHours())}:${twoDigit(date.getMinutes())}:${twoDigit(date.getSeconds())}`;
+        }
+
+        function myDay(day) {
+            switch (day) {
+                case 0: return '(일)';
+                case 1: return '(월)';
+                case 2: return '(화)';
+                case 3: return '(수)';
+                case 4: return '(목)';
+                case 5: return '(금)';
+                case 6: return '(토)';
+                return '';
+            }
+        }
+
+        function clock() {
+            const now = new Date();
+            const week = '일월화수목금토'.split('');     // ['일', ..., '토']
+            // const week = ['(일)', '(월)', '(화)', '(수)', '(목)', '(금)', '(토)'];
+
+            let dateStr = myDatetime(now).substring(2,10); // 23-03-21
+            const timeStr = myDatetime(now).substring(11, 19); // 09:23:22
+            dateStr +=  '(' + week[now.getDay()] + ')';
+            // dateStr +=  week[now.getDay()];
+            // dateStr +=  myDay(now.getDay());
+            
+            document.getElementById('date').innerHTML = dateStr;
+            document.getElementById('time').innerHTML = timeStr;
+
+        }
+
+        window.onload = function() {
+
+            clock();
+            setInterval(function() {
+                clock();
+
+            }, 1000);
+
+        }
+
+    </script>
+</head>
+<body style="margin: 40px">
+
+    <h2 id="date"></h2>
+    <hr>
+    <h2 id="time"></h2>
+    
+</body>
+</html>
