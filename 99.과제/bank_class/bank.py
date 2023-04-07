@@ -1,7 +1,5 @@
 import sys
 import bank_util as bu
-
-
 # 계좌는 계좌번호, 소유주, 잔액으로 구성됨
 # 계좌번호는 생성된 시점의 시간, 분, 초 6자리로 구성됨.
 # account = [
@@ -24,21 +22,16 @@ while True:
         sys.exit()
 
     if menu == 1:
-
-        bu.create_acount(account)
+        bu.create_account(account)
         
     elif menu == 2:
-        print()
-        for acc in account:
-            for key, val in acc.items():            
-                print(f'{key}: {val}', end='\t')
-            print()
-        print()
+        bu.list_account(account)
 
     elif menu == 3:
         bu.deposit(account)
-        print()
-        
+    
     elif menu == 4:
         bu.withdraw(account)
-        print()
+
+    print()
+
