@@ -3,29 +3,25 @@
 # 계좌번호는 생성된 시점의 시간, 분, 초 6자리로 구성됨.
 # 이름과 금액을 입력으로 받아서 account에 새로운 항목을 추가
 
-import pickle
 import datetime as dt 
-from account import Account
+import pickle
+
 
 def is_name(name, account):
     for acc in account:
-        if acc.owner == name:
+        if acc['소유주'] == name:
             return True
     return False
 
 
-def is_ano(ano, account):
+def get_ano_balance(ano, account):
     for acc in account:
-        if acc.ano == ano:
-            return True
-    return False
+        if acc['계좌번호'] == ano:
+            return True, acc['잔액']
 
-def list_account(account):
-    for acc in account:
-        print(acc)
+    return False, 0
 
-def create_account(account):
-
+def create_acount(account):
     while True:
         name = input('\n이름을 입력해주세요.[이전단계 : Q/q] > ')
         if name == '':
@@ -55,10 +51,11 @@ def create_account(account):
 
     # account 에 추가하기
     ano = dt.datetime.now().strftime('%H%M%S')
-    new_account = Account(ano, name, price)
-    account.append(new_account)
-    print(new_account)
-    
+    account.append({'계좌번호':ano, '소유주':name, '잔액': price})
+    print(f'{name}님의 계좌번호: {ano} 로 생성되었습니다.\n')
+
+    # return account
+
 # 계좌번호와 금액을 입력으로 받아서 계좌의 금액을 입금
 # 입금
 def deposit(account):
@@ -70,13 +67,13 @@ def deposit(account):
             if ano == 'Q' or ano == 'q':
                 return
 
-            if not is_ano(ano, account) :
+            ano_check, money = get_ano_balance(ano, account)
+            if not ano_check :
                 print(f'\n계좌가 없습니다. 계좌를 먼저 개설해 주세요.')
                 return
             break
 
     # 금액을 받는 부분
-    price = 0
     while True:
         try : 
             price = int(input('\n입금할 금액을 입력하세요. 최소 1,000원 이상입니다. > '))
@@ -89,10 +86,11 @@ def deposit(account):
             continue
         break
 
-  
+    money += price
+    
     for acc in account:
-        if acc.ano == ano:
-            acc.deposit(price)
+        if acc['계좌번호'] == ano:
+            acc['잔액'] = money
             break
 
 # 계좌번호와 금액을 입력으로 받아서 계좌의 금액을 인출
@@ -105,7 +103,8 @@ def withdraw(account):
             if ano == 'Q' or ano == 'q':
                 return
 
-            if not is_ano(ano, account) :
+            ano_check, money = get_ano_balance(ano, account)
+            if not ano_check :
                 print(f'\n계좌가 없습니다. 계좌를 먼저 개설해 주세요.')
                 return
             break
@@ -113,19 +112,25 @@ def withdraw(account):
     # 금액을 받는 부분
     while True:
         try : 
+            print(f'고객님의 잔액은 {money:,d} 원입니다.\n')
             price = int(input('\n찾을 금액을 입력하세요. > '))
         except:
             print('금액을 잘못 입력했습니다.')
             continue
+        
+        if money < price:
+            print('찾을 금액이 잔액보다 큼니다.')
+            continue
         break
 
+    money -= price
+    
     for acc in account:
-        if acc.ano == ano:
-            acc.withdrow(price)
+        if acc['계좌번호'] == ano:
+            acc['잔액'] = money
             break
 
 def account_save(account):
-
     with open('data/bank.pkl', 'wb') as file:
         pickle.dump(account, file)
     
@@ -135,6 +140,6 @@ def account_read():
         with open('data/bank.pkl', 'rb') as file:
             account = pickle.load(file)
     except:
-        account.append(Account('142603', '홍길동', 10000))
+        pass
 
     return account
